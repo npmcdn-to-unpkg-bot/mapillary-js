@@ -13,8 +13,8 @@ export class GraphService {
     private _updates$: rx.Subject<any> = new rx.Subject<any>();
 
     private _cache$: rx.Subject<any> = new rx.Subject<any>();
-    private _cachedNode$: rx.ConnectableObservable<Node>;
-    private _loadingNode$: rx.ConnectableObservable<Node>;
+    private _cachedNode$: rx.Observable<Node>;
+    private _loadingNode$: rx.Observable<Node>;
 
     private _graph$: rx.Observable<Graph>;
 
@@ -46,14 +46,12 @@ export class GraphService {
             return node.key + node.lastCacheEvict;
         }).flatMap<Node>((node: Node): rx.Observable<Node> => {
             return node.cacheAssets();
-        }).publish();
-        this._loadingNode$.connect();
+        }).shareReplay(1);
         this._loadingNode$.subscribe(this._imageLoadingService.loadnode$);
 
         this._cachedNode$ = this._loadingNode$.filter((node: Node): boolean => {
             return (!!node.image && !!node.mesh);
-        }).publish();
-        this._cachedNode$.connect();
+        }).shareReplay(1);
         this._cachedNode$.subscribe(this._tilesService.cacheNode$);
         this._cachedNode$.subscribe(this._vectorTilesService.cacheNode$);
 
@@ -97,6 +95,7 @@ export class GraphService {
             let node: Node = graph.getNode(key);
             if (node == null) {
                 this._tilesService.cacheIm$.onNext(key);
+                this._vectorTilesService.cacheKeyTile$.onNext(key);
                 return true;
             }
 

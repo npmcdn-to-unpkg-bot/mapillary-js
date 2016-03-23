@@ -10,6 +10,7 @@ export class VectorTilesService {
     private _apiV3: APIv3;
 
     private _webMercator: WebMercator;
+    private _cacheKeyTile$: rx.Subject<string> = new rx.Subject<string>();
     private _cacheNode$: rx.Subject<Node> = new rx.Subject<Node>();
     private _mapillaryObjects$: rx.Observable<any>;
 
@@ -82,6 +83,44 @@ export class VectorTilesService {
 
             return rx.Observable.from(ret);
         }).shareReplay(1);
+
+        this._cacheKeyTile$.subscribe((key: string): void => {
+            console.log(`cache key tile ${key}`);
+            this._apiV3.model.get(["imageByKey", key, ["l"]]).subscribe((response: any) => {
+                let tile: ITile = this._webMercator.getTile(response.json.imageByKey[key].l, 20);
+
+                this._apiV3.model.get([
+                    "tile",
+                    "all",
+                    tile.z,
+                    tile.x,
+                    tile.y,
+                    "images",
+                    {from: 0, to: 1000},
+                    [
+                        "key", "l", "cl", "ca", "cca", "cfocal", "atomic_scale", "user_uuid",
+                        "gps_accuracy", "camera_mode", "captured_at", "compass_accuracy", "location",
+                        "fmm35", "orientation", "width", "height", "make", "merge_version", "c_rotation",
+                        "calt", "merge_cc", "gpano", "sequence",
+                    ],
+                ]).subscribe((response2: any) => {
+                    let images: any = response2.json.tile.all[tile.z][tile.x][tile.y].images;
+                    let sequences: any = {};
+                    for (let image in images) {
+                        if (!images.hasOwnProperty(image)) {
+                            continue;
+                        }
+                        let i: any = images[image];
+                        sequences[i.sequence] = true;
+                    }
+                    console.log(sequences);
+                });
+            });
+        });
+    }
+
+    public get cacheKeyTile$(): rx.Subject<string> {
+        return this._cacheKeyTile$;
     }
 
     public get cacheNode$(): rx.Subject<Node> {
