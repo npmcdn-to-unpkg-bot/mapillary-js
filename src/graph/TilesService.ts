@@ -17,7 +17,7 @@ import "rxjs/add/operator/merge";
 import "rxjs/add/operator/publish";
 import "rxjs/add/operator/publishReplay";
 
-import {IAPINavIm, APIv2} from "../API";
+import {IAPINavIm, APIv2, APIv3} from "../API";
 import {Spatial} from "../Geo";
 import {Node} from "../Graph";
 
@@ -42,10 +42,12 @@ export class TilesService {
     private _spatialLib: Spatial;
 
     private _apiV2: APIv2;
+    private _apiV3: APIv3;
 
-    constructor (apiV2: APIv2) {
+    constructor (apiV2: APIv2, apiV3: APIv3) {
         this._spatialLib = new Spatial();
         this._apiV2 = apiV2;
+        this._apiV3 = apiV3;
 
         this._cachedTiles$ = this._updates$
             .scan<{[key: string]: boolean}>(
@@ -60,6 +62,7 @@ export class TilesService {
             .distinct()
             .mergeMap<IAPINavIm>(
                 (im: string): Observable<IAPINavIm> => {
+                    this._apiV3.imagesByImageH(im);
                     return Observable.fromPromise<IAPINavIm>(this._apiV2.nav.im(im));
                 });
 
@@ -67,6 +70,7 @@ export class TilesService {
             .distinct()
             .mergeMap<IAPINavIm>(
                 (h: string): Observable<IAPINavIm> => {
+                    this._apiV3.imagesByH(h);
                     return Observable.fromPromise<IAPINavIm>(this._apiV2.nav.h(h));
                 });
 

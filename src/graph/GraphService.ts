@@ -38,7 +38,7 @@ export class GraphService {
     private _imageLoadingService: ImageLoadingService;
 
     constructor (apiV2: APIv2, apiV3: APIv3) {
-        this._tilesService = new TilesService(apiV2);
+        this._tilesService = new TilesService(apiV2, apiV3);
         this._vectorTilesService = new VectorTilesService(apiV3);
         this._imageLoadingService = new ImageLoadingService();
 

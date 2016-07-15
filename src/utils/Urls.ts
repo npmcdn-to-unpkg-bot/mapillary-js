@@ -4,7 +4,7 @@ export class Urls {
     }
 
     public static falcorModel(clientId: string): string {
-        return `http://mapillary-vector.mapillary.io/v3/model.json?client_id=${clientId}`;
+        return `https://a.mapillary.com/v3/model.json?client_id=${clientId}`;
     }
 
     public static mesh(key: string): string {
