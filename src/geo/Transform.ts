@@ -128,8 +128,8 @@ export class Transform {
      *
      * @param {number} x - SfM x-coordinate.
      * @param {number} y - SfM y-coordinate.
-     * @param {number} depth - Depth to unproject 3D coordinate from camera center.
-     * @returns {THREE.Vector3} 3D world coordinate.
+     * @param {number} depth - Depth to unproject 3D coordinates from camera center.
+     * @returns {THREE.Vector3} 3D world coordinates.
      */
     public pixelToVertex(x: number, y: number, depth: number): THREE.Vector3 {
         let v: THREE.Vector4 = new THREE.Vector4(
@@ -203,7 +203,7 @@ export class Transform {
      *
      * @param {Array<number>} pixel - 2D basic coordinates.
      * @param {Array<number>} distance - Depth to unproject from camera center.
-     * @returns {Array<number>} Unprojected 3D world coordinate.
+     * @returns {Array<number>} Unprojected 3D world coordinates.
      */
     public unprojectBasic(pixel: number[], distance: number): number[] {
         let sfm: number[] = this._basicToSfm(pixel);
@@ -227,7 +227,7 @@ export class Transform {
      *
      * @param {Array<number>} pixel - 2D SfM coordinates.
      * @param {Array<number>} distance - Depth to unproject from camera center.
-     * @returns {Array<number>} Unprojected 3D world coordinate.
+     * @returns {Array<number>} Unprojected 3D world coordinates.
      */
     public unprojectSfM(pixel: number[], distance: number): number[] {
         let bearing: number[] = this._pixelToBearing(pixel);
